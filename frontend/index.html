@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Frontend - Projeto Docker Compose Cod3r Cursos</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Docker Compose com jQuery, Express.js e MongoDB</h1>
+            <hr>
+            <div>
+                <input name='id' type='hidden' />
+                <div class="form-group">
+                    <label for="Name"></label>
+                    <input class='form-control' name='name' placeholder='Digite o nome' />
+                </div>
+                <button class='btn btn-success' save>Salvar</button>
+            </div>
+
+            <table class="table" id='clients'>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsRows"></tbody>
+            </table>
+        </div>
+
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+
+        <script>
+            // DECLARAÇÃO DA ROTA DA API REST
+            const API = 'http://localhost:3000'
+
+            // ABAIXO A FUNÇÃO PARA RENDERIZAR O BOTÃO
+            const createButton = (label, type) => {
+                return $('<button>').addClass(`btn btn-${type} ml-2`).html(label)
+            }
+
+            // ABAIXO A FUNÇÃO PARA RENDERIZAR AS COLUNAS DA TABELA COM OS NOMES
+            const renderRows = clients => {
+                const rows = clients.map(client => {
+                    const updateButton = createButton('Atualizar', 'warning')
+                    updateButton.click(() => loadClient(client))
+
+                    const removeButton = createButton('Excluir', 'danger')
+                    removeButton.click(() => removeClient(client))
+
+                    return $('<tr>')
+                        .append($('<td>').append(client.name))
+                        .append($('<td>').append(updateButton).append(removeButton))
+                })
+
+                $('#clientsRows').html(rows)
+            }
+
+            // ABAIXO A FUNÇÃO PARA ATUALIZAR O REGISTRO DO NOME PREENCHENDO O MESMO NO INPUT PARA SER EDITADO
+            const loadClient = client => {
+                $('[name=id]').val(client._id)
+                $('[name=name]').val(client.name)
+            }
+
+            // ABAIXO A FUNÇÃO PARA REMOVER OS NOMES CADASTRADOS NO SISTEMA
+            const removeClient = client => {
+                $.ajax({
+                    method: 'DELETE',
+                    url: `${API}/clients/${client._id}`,
+                    success: getClients
+                })
+            }
+
+            // ABAIXO A FUNÇÃO PARA BUSCAR OS REGISTROS DE CLIENTES E PASSAR OS MESMOS PARA renderRows COMO PARÂMETRO
+            const getClients = () => {
+                $.ajax({
+                    url: `${API}/clients`,
+                    success: clients => {
+                        renderRows(clients)
+                        $('[name]').val('')
+                    }
+                })
+            }
+
+            // ABAIXO A FUNÇÃO PARA SALVAR OU EDITAR UM NOME
+            const saveClient = () => {
+                const _id = $('[name=id]').val()
+                const name = $('[name=name]').val()
+                $.ajax({
+                    method: _id ? 'PUT' : 'POST',
+                    url: `${API}/clients/${_id}`,
+                    data: _id ? { _id, name } : { name },
+                    success: getClients
+                })
+            }
+
+            // NA INICIALIZAÇÃO DO jQuery NÓS JÁ CHAMAMOS A FUNÇÃO getClients() PARA ATUALIZAR A LISTA DE NOMES
+            $(() => {
+                getClients()
+                $('[save]').click(saveClient)
+            })
+        </script>
+    </body>
+</html>
