@@ -21,7 +21,7 @@ View this aplication at: http://localhost
 ### A partial view of the application running in the browser:
 
 <p align="center">
-  <img src="./image/docker-compose-simple-register.png" alt="Image the application running" width="1280">
+  <img src="./images/docker-compose-simple-register.png" alt="Image the application running" width="1280">
 </p>
 
 ### Do you want to know more about my projects and career as a developer? Click on the link below and access my Linkedin.
